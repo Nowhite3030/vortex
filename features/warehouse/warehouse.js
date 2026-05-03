@@ -170,7 +170,7 @@ function renderItems() {
       stock.classList.add("low");
     }
 
-    imageMetaText.textContent = formatImageMeta(item.imageMeta);
+    // imageMetaText.textContent = formatImageMeta(item.imageMeta);
 
     takeBtn.onclick = () =>
       adjustQuantity(item.id, -Number(adjustInput.value || 0));
@@ -509,7 +509,7 @@ function useCrop(full = false) {
   // ⭐ 預覽 = 最終圖（關鍵）
   previewBox.innerHTML = `<img src="${imageBase64}">`;
 
-  imageInfo.textContent = formatImageMeta(imageMeta);
+  // imageInfo.textContent = formatImageMeta(imageMeta);
 
   closeCropper();
 }
