@@ -38,10 +38,12 @@
           物品圖片
           <input type="file" id="itemImage" accept="image/*" />
         </label>
+        <p class="helper-text">選擇圖片後會開啟裁切視窗，可用滑鼠拖曳保留範圍。</p>
 
         <div id="previewBox" class="preview-box">
           <span>圖片預覽</span>
         </div>
+        <p id="imageInfo" class="image-info-text">尚未選擇圖片</p>
 
         <button type="submit" class="primary-btn">新增物品</button>
       </form>
@@ -64,6 +66,27 @@
     </section>
   </main>
 
+  <div id="cropModal" class="crop-modal" aria-hidden="true">
+    <div class="crop-dialog" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+      <div class="crop-header">
+        <div>
+          <h2 id="cropTitle">裁切物品圖片</h2>
+          <p id="cropHint">用滑鼠拖曳框選要保留的範圍，框外內容會被截掉。</p>
+        </div>
+        <button type="button" id="cropCancelTopBtn" class="icon-btn" aria-label="關閉裁切視窗">×</button>
+      </div>
+      <div class="crop-stage-wrap">
+        <canvas id="cropCanvas"></canvas>
+      </div>
+      <p id="cropInfo" class="image-info-text">尚未選擇裁切範圍</p>
+      <div class="crop-actions">
+        <button type="button" id="cropFullBtn" class="secondary-action-btn">保留整張</button>
+        <button type="button" id="cropCancelBtn" class="danger-outline-btn">取消</button>
+        <button type="button" id="cropConfirmBtn" class="primary-btn">確認裁切</button>
+      </div>
+    </div>
+  </div>
+
   <template id="itemCardTemplate">
     <article class="item-card">
       <div class="image-wrap"></div>
@@ -71,6 +94,7 @@
         <h3></h3>
         <p class="category"></p>
         <p class="stock"></p>
+        <p class="image-meta"></p>
       </div>
       <div class="adjust-row">
         <input type="number" min="1" value="1" class="adjust-input" />
