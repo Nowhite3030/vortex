@@ -1,1 +1,58 @@
-.login-shell{min-height:100vh;display:grid;place-items:center;padding:24px}.login-card{width:min(440px,100%);padding:34px;border-radius:32px;background:rgba(255,255,255,.10);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(20px)}.login-card h1{margin:18px 0 8px}.login-card p{color:var(--muted)}.login-form{display:grid;gap:16px;margin-top:24px}.error-text{min-height:20px;color:#fecdd3}.demo-box{display:grid;gap:5px;margin-top:16px;padding:14px;border-radius:18px;background:rgba(139,92,246,.14);border:1px solid rgba(167,139,250,.25)}.demo-box span{color:#d8c8ef;font-size:13px}
+/* ================= Login Layout ================= */
+
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: min(440px, 100%);
+  padding: 34px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+/* ================= Text ================= */
+
+.login-card h1 {
+  margin: 18px 0 8px;
+}
+
+.login-card p {
+  color: var(--muted);
+}
+
+/* ================= Form ================= */
+
+.login-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.error-text {
+  min-height: 20px;
+  color: #fecdd3;
+}
+
+/* ================= Demo Info ================= */
+
+.demo-box {
+  display: grid;
+  gap: 5px;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+}
+
+.demo-box span {
+  color: #d8c8ef;
+  font-size: 13px;
+}
