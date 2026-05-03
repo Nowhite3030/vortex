@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>倉庫管理系統</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>倉庫管理系統</h1>
+      <p>新增、刪除、提取、補充與圖片化管理物品</p>
+    </div>
+    <button id="exportBtn" class="secondary-btn">匯出資料</button>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2>新增物品</h2>
+      <form id="itemForm">
+        <label>
+          物品名稱
+          <input type="text" id="itemName" placeholder="例如：繃帶、電池、飲料" required />
+        </label>
+
+        <label>
+          分類
+          <input type="text" id="itemCategory" placeholder="例如：醫療、工具、食物" />
+        </label>
+
+        <label>
+          初始數量
+          <input type="number" id="itemQuantity" min="0" value="0" required />
+        </label>
+
+        <label>
+          物品圖片
+          <input type="file" id="itemImage" accept="image/*" />
+        </label>
+
+        <div id="previewBox" class="preview-box">
+          <span>圖片預覽</span>
+        </div>
+
+        <button type="submit" class="primary-btn">新增物品</button>
+      </form>
+    </section>
+
+    <section class="panel list-panel">
+      <div class="section-header">
+        <h2>物品列表</h2>
+        <input type="search" id="searchInput" placeholder="搜尋物品或分類..." />
+      </div>
+      <div id="itemGrid" class="item-grid"></div>
+    </section>
+
+    <section class="panel log-panel">
+      <div class="section-header">
+        <h2>操作紀錄</h2>
+        <button id="clearLogBtn" class="danger-outline-btn">清空紀錄</button>
+      </div>
+      <ul id="logList" class="log-list"></ul>
+    </section>
+  </main>
+
+  <template id="itemCardTemplate">
+    <article class="item-card">
+      <div class="image-wrap"></div>
+      <div class="item-info">
+        <h3></h3>
+        <p class="category"></p>
+        <p class="stock"></p>
+      </div>
+      <div class="adjust-row">
+        <input type="number" min="1" value="1" class="adjust-input" />
+        <button class="take-btn">提取</button>
+        <button class="add-btn">補充</button>
+      </div>
+      <button class="delete-btn">刪除物品</button>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
