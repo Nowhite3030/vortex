@@ -148,7 +148,7 @@ function renderItems() {
       title = card.querySelector("h3"),
       category = card.querySelector(".category"),
       stock = card.querySelector(".stock"),
-      imageMetaText = card.querySelector(".image-meta"),
+      // imageMetaText = card.querySelector(".image-meta"),
       adjustInput = card.querySelector(".adjust-input"),
       takeBtn = card.querySelector(".take-btn"),
       addBtn = card.querySelector(".add-btn"),
@@ -509,7 +509,7 @@ function useCrop(full = false) {
   // ⭐ 預覽 = 最終圖（關鍵）
   previewBox.innerHTML = `<img src="${imageBase64}">`;
 
-  // imageInfo.textContent = formatImageMeta(imageMeta);
+  imageInfo.textContent = "";
 
   closeCropper();
 }
