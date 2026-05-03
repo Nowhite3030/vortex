@@ -72,7 +72,8 @@
 /* ================= Image ================= */
 
 .image-wrap {
-  height: 170px;
+  width: 100%;
+  height: 100%;
   border-radius: 20px;
   background: linear-gradient(
     135deg,

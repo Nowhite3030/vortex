@@ -461,11 +461,7 @@ function useCrop(full = false) {
   const img = cropState.sourceImage;
   if (!img) return;
 
-  let sx = 0,
-    sy = 0,
-    sw = img.naturalWidth,
-    sh = img.naturalHeight;
-
+  let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
   const s = cropState.selection;
 
   if (!full && s && s.w > 5 && s.h > 5) {
@@ -475,40 +471,44 @@ function useCrop(full = false) {
     sh = s.h * img.naturalHeight / cropCanvas.height;
   }
 
+  const FIXED = FIXED_IMAGE_SIZE;
+
   const out = document.createElement("canvas");
   const ctx = out.getContext("2d");
 
-  out.width = FIXED_IMAGE_SIZE;
-  out.height = FIXED_IMAGE_SIZE;
+  out.width = FIXED;
+  out.height = FIXED;
 
-  const scale = Math.max(FIXED_IMAGE_SIZE / sw, FIXED_IMAGE_SIZE / sh);
-  const dx = (FIXED_IMAGE_SIZE - sw * scale) / 2;
-  const dy = (FIXED_IMAGE_SIZE - sh * scale) / 2;
+  // ⭐ 只做一次比例計算
+  const scale = Math.max(FIXED / sw, FIXED / sh);
+
+  const drawW = sw * scale;
+  const drawH = sh * scale;
+
+  const dx = (FIXED - drawW) / 2;
+  const dy = (FIXED - drawH) / 2;
 
   ctx.drawImage(
     img,
-    sx,
-    sy,
-    sw,
-    sh,
-    dx,
-    dy,
-    sw * scale,
-    sh * scale
+    sx, sy, sw, sh,
+    dx, dy, drawW, drawH
   );
 
+  // ⭐ 唯一來源
   imageBase64 = out.toDataURL("image/png");
 
   imageMeta = {
-    width: FIXED_IMAGE_SIZE,
-    height: FIXED_IMAGE_SIZE,
+    width: FIXED,
+    height: FIXED,
     fileSize: Math.round(imageBase64.length * 0.75),
     originalWidth: img.naturalWidth,
     originalHeight: img.naturalHeight,
     cropped: !full && !!s
   };
 
-  previewBox.innerHTML = `<img src="${imageBase64}" alt="圖片預覽">`;
+  // ⭐ 預覽 = 最終圖（關鍵）
+  previewBox.innerHTML = `<img src="${imageBase64}">`;
+
   imageInfo.textContent = formatImageMeta(imageMeta);
 
   closeCropper();
