@@ -1,6 +1,6 @@
 const STORAGE_KEY = "vortex_warehouse_items_v2";
 const LOG_KEY = "vortex_warehouse_logs_v2";
-const FIXED_IMAGE_SIZE = 300;
+const FIXED_IMAGE_SIZE = 200;
 
 const itemForm = document.getElementById("itemForm"),
   itemName = document.getElementById("itemName"),
