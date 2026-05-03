@@ -3,108 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>倉庫管理系統</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Vortex 倉庫管理系統</title>
+  <link rel="stylesheet" href="assets/css/theme.css" />
+  <link rel="stylesheet" href="features/auth/auth.css" />
+  <link rel="stylesheet" href="features/warehouse/warehouse.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>倉庫管理系統</h1>
-      <p>新增、刪除、提取、補充與圖片化管理物品</p>
-    </div>
-    <button id="exportBtn" class="secondary-btn">匯出資料</button>
-  </header>
-
-  <main class="layout">
-    <section class="panel form-panel">
-      <h2>新增物品</h2>
-      <form id="itemForm">
-        <label>
-          物品名稱
-          <input type="text" id="itemName" placeholder="例如：繃帶、電池、飲料" required />
-        </label>
-
-        <label>
-          分類
-          <input type="text" id="itemCategory" placeholder="例如：醫療、工具、食物" />
-        </label>
-
-        <label>
-          初始數量
-          <input type="number" id="itemQuantity" min="0" value="0" required />
-        </label>
-
-        <label>
-          物品圖片
-          <input type="file" id="itemImage" accept="image/*" />
-        </label>
-        <p class="helper-text">選擇圖片後會開啟裁切視窗，可用滑鼠拖曳保留範圍。</p>
-
-        <div id="previewBox" class="preview-box">
-          <span>圖片預覽</span>
-        </div>
-        <p id="imageInfo" class="image-info-text">尚未選擇圖片</p>
-
-        <button type="submit" class="primary-btn">新增物品</button>
+  <section id="loginView" class="login-shell">
+    <div class="login-card">
+      <div class="brand-mark">V</div>
+      <h1>Vortex 管理系統</h1>
+      <p>請登入後查看倉庫、公費與活點地圖等功能。</p>
+      <form id="loginForm" class="login-form">
+        <label>帳號<input id="loginUsername" type="text" autocomplete="username" required placeholder="admin" /></label>
+        <label>密碼<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="admin123" /></label>
+        <button class="primary-btn" type="submit">登入</button>
       </form>
-    </section>
+      <p id="loginError" class="error-text"></p>
+    </div>
+  </section>
 
-    <section class="panel list-panel">
-      <div class="section-header">
-        <h2>物品列表</h2>
-        <input type="search" id="searchInput" placeholder="搜尋物品或分類..." />
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><div class="brand-mark small">V</div><div><strong>Vortex</strong><span>Control Panel</span></div></div>
+      <nav class="side-nav">
+        <button class="nav-btn active" data-page="warehousePage">倉庫管理</button>
+        <button class="nav-btn" data-page="publicFundsPage">公費</button>
+        <button class="nav-btn" data-page="liveMapPage">活點地圖</button>
+      </nav>
+      <div class="user-card">
+        <span id="currentUserName"></span>
+        <small id="currentUserRole"></small>
+        <button id="logoutBtn" class="secondary-btn">登出</button>
       </div>
-      <div id="itemGrid" class="item-grid"></div>
-    </section>
+    </aside>
 
-    <section class="panel log-panel">
-      <div class="section-header">
-        <h2>操作紀錄</h2>
-        <button id="clearLogBtn" class="danger-outline-btn">清空紀錄</button>
-      </div>
-      <ul id="logList" class="log-list"></ul>
-    </section>
-  </main>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h1>倉庫管理系統</h1>
+          <p>紫羅蘭色系介面，支援圖片裁切、庫存異動與身分組權限。</p>
+        </div>
+        <button id="exportBtn" class="secondary-btn">匯出資料</button>
+      </header>
+
+      <section id="warehousePage" class="page active-page">
+        <div class="layout">
+          <section class="panel form-panel">
+            <h2>新增物品</h2>
+            <form id="itemForm">
+              <label>物品名稱<input type="text" id="itemName" placeholder="例如：繃帶、電池、飲料" required /></label>
+              <label>分類<input type="text" id="itemCategory" placeholder="例如：醫療、工具、食物" /></label>
+              <label>初始數量<input type="number" id="itemQuantity" min="0" value="0" required /></label>
+              <label>物品圖片<input type="file" id="itemImage" accept="image/*" /></label>
+              <p class="helper-text">選擇圖片後會開啟裁切視窗，可用滑鼠拖曳保留範圍。</p>
+              <div id="previewBox" class="preview-box"><span>圖片預覽</span></div>
+              <p id="imageInfo" class="image-info-text">尚未選擇圖片</p>
+              <button type="submit" class="primary-btn">新增物品</button>
+            </form>
+          </section>
+
+          <section class="panel list-panel">
+            <div class="section-header">
+              <h2>物品列表</h2>
+              <input type="search" id="searchInput" placeholder="搜尋物品或分類..." />
+            </div>
+            <div id="itemGrid" class="item-grid"></div>
+          </section>
+
+          <section class="panel log-panel">
+            <div class="section-header">
+              <h2>操作紀錄</h2>
+              <button id="clearLogBtn" class="danger-outline-btn role-admin-only">清空紀錄</button>
+            </div>
+            <p id="logPermissionHint" class="permission-hint"></p>
+            <ul id="logList" class="log-list"></ul>
+          </section>
+        </div>
+      </section>
+
+      <section id="publicFundsPage" class="page">
+        <div class="placeholder-panel"><h2>公費</h2><p>此功能已預留獨立資料夾：<code>features/public-funds/</code>，未來可集中新增公費頁面、樣式與邏輯。</p></div>
+      </section>
+
+      <section id="liveMapPage" class="page">
+        <div class="placeholder-panel"><h2>活點地圖</h2><p>此功能已預留獨立資料夾：<code>features/live-map/</code>，未來可集中新增地圖頁面、樣式與邏輯。</p></div>
+      </section>
+    </main>
+  </section>
 
   <div id="cropModal" class="crop-modal" aria-hidden="true">
     <div class="crop-dialog" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
-      <div class="crop-header">
-        <div>
-          <h2 id="cropTitle">裁切物品圖片</h2>
-          <p id="cropHint">用滑鼠拖曳框選要保留的範圍，框外內容會被截掉。</p>
-        </div>
-        <button type="button" id="cropCancelTopBtn" class="icon-btn" aria-label="關閉裁切視窗">×</button>
-      </div>
-      <div class="crop-stage-wrap">
-        <canvas id="cropCanvas"></canvas>
-      </div>
+      <div class="crop-header"><div><h2 id="cropTitle">裁切物品圖片</h2><p id="cropHint">用滑鼠拖曳框選要保留的範圍，框外內容會被截掉。</p></div><button type="button" id="cropCancelTopBtn" class="icon-btn">×</button></div>
+      <div class="crop-stage-wrap"><canvas id="cropCanvas"></canvas></div>
       <p id="cropInfo" class="image-info-text">尚未選擇裁切範圍</p>
-      <div class="crop-actions">
-        <button type="button" id="cropFullBtn" class="secondary-action-btn">保留整張</button>
-        <button type="button" id="cropCancelBtn" class="danger-outline-btn">取消</button>
-        <button type="button" id="cropConfirmBtn" class="primary-btn">確認裁切</button>
-      </div>
+      <div class="crop-actions"><button type="button" id="cropFullBtn" class="secondary-action-btn">保留整張</button><button type="button" id="cropCancelBtn" class="danger-outline-btn">取消</button><button type="button" id="cropConfirmBtn" class="primary-btn">確認裁切</button></div>
     </div>
   </div>
 
   <template id="itemCardTemplate">
     <article class="item-card">
       <div class="image-wrap"></div>
-      <div class="item-info">
-        <h3></h3>
-        <p class="category"></p>
-        <p class="stock"></p>
-        <p class="image-meta"></p>
-      </div>
-      <div class="adjust-row">
-        <input type="number" min="1" value="1" class="adjust-input" />
-        <button class="take-btn">提取</button>
-        <button class="add-btn">補充</button>
-      </div>
-      <button class="delete-btn">刪除物品</button>
+      <div class="item-info"><h3></h3><p class="category"></p><p class="stock"></p><p class="image-meta"></p></div>
+      <div class="adjust-row"><input type="number" min="1" value="1" class="adjust-input" /><button class="take-btn">提取</button><button class="add-btn">補充</button></div>
+      <button class="delete-btn role-admin-only">刪除物品</button>
     </article>
   </template>
 
-  <script src="script.js"></script>
+  <script src="features/auth/users.js"></script>
+  <script src="features/auth/auth.js"></script>
+  <script src="shared/js/app.js"></script>
+  <script src="features/warehouse/warehouse.js"></script>
 </body>
 </html>

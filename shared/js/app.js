@@ -1,0 +1,9 @@
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.page).classList.add("active-page");
+  });
+});
+window.Auth.requireLogin();
