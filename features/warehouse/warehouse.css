@@ -35,7 +35,8 @@
 /* ================= Preview ================= */
 
 .preview-box {
-  min-height: 190px;
+  width: 100%;
+  height: 100%;
   border: 1px dashed rgba(167, 139, 250, 0.55);
   border-radius: 22px;
   background: rgba(139, 92, 246, 0.10);
