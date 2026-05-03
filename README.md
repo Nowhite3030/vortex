@@ -11,6 +11,3 @@
 - features/warehouse：倉庫功能
 - features/public-funds：公費功能預留資料夾
 - features/live-map：活點地圖功能預留資料夾
-
-## 重要提醒
-此版本是 GitHub Pages 可用的純前端示範版，帳密資料寫在前端檔案中，不能拿來保護真正機密資料。正式使用請接 Firebase Auth、Supabase Auth 或後端 API。

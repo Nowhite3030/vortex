@@ -1,5 +1,6 @@
 const STORAGE_KEY = "vortex_warehouse_items_v2";
 const LOG_KEY = "vortex_warehouse_logs_v2";
+const FIXED_IMAGE_SIZE = 300;
 
 const itemForm = document.getElementById("itemForm"),
   itemName = document.getElementById("itemName"),
@@ -158,6 +159,7 @@ function renderItems() {
       : "無圖片";
 
     title.textContent = item.name;
+
     category.textContent = item.category
       ? `分類：${item.category}`
       : "分類：未分類";
@@ -221,7 +223,9 @@ function adjustQuantity(id, amount) {
 
   item.quantity += amount;
 
-  addLog(`${amount > 0 ? "補充" : "提取"}「${item.name}」${Math.abs(amount)} 個，剩餘 ${item.quantity}`);
+  addLog(
+    `${amount > 0 ? "補充" : "提取"}「${item.name}」${Math.abs(amount)} 個，剩餘 ${item.quantity}`
+  );
 
   saveData();
   renderItems();
@@ -246,7 +250,7 @@ function deleteItem(id) {
   renderItems();
 }
 
-/* ================= 事件 ================= */
+/* ================= 新增物品 ================= */
 
 itemForm.addEventListener("submit", e => {
   e.preventDefault();
@@ -277,6 +281,256 @@ itemForm.addEventListener("submit", e => {
 });
 
 searchInput.addEventListener("input", renderItems);
+
+/* ================= 清空紀錄 ================= */
+
+clearLogBtn.addEventListener("click", () => {
+  if (!window.Auth.isAdmin()) {
+    alert("只有管理員身分組可以刪除紀錄。");
+    return;
+  }
+
+  if (confirm("確定清空所有操作紀錄？")) {
+    logs = [];
+    saveData();
+    renderLogs();
+  }
+});
+
+/* ================= 匯出資料 ================= */
+
+exportBtn.addEventListener("click", () => {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    items,
+    logs
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "vortex-warehouse-export.json";
+  a.click();
+
+  URL.revokeObjectURL(a.href);
+});
+
+/* ================= 圖片上傳 ================= */
+
+itemImage.addEventListener("change", e => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("請選擇圖片檔");
+    resetImageInput();
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => openCropper(reader.result, file);
+  reader.readAsDataURL(file);
+});
+
+/* ================= 裁切功能 ================= */
+
+function openCropper(dataUrl, file) {
+  const img = new Image();
+
+  img.onload = () => {
+    cropState = {
+      file,
+      sourceImage: img,
+      originalDataUrl: dataUrl,
+      selection: null,
+      isDragging: false,
+      startX: 0,
+      startY: 0
+    };
+
+    const maxW = Math.min(760, window.innerWidth - 80);
+    const ratio = Math.min(1, maxW / img.naturalWidth, 520 / img.naturalHeight);
+
+    cropCanvas.width = Math.round(img.naturalWidth * ratio);
+    cropCanvas.height = Math.round(img.naturalHeight * ratio);
+
+    cropModal.classList.add("show");
+    cropModal.setAttribute("aria-hidden", "false");
+
+    drawCropCanvas();
+
+    cropInfo.textContent =
+      `原圖：${img.naturalWidth} × ${img.naturalHeight}px，${formatFileSize(file.size)}｜輸出：${FIXED_IMAGE_SIZE} × ${FIXED_IMAGE_SIZE}px`;
+  };
+
+  img.src = dataUrl;
+}
+
+function closeCropper() {
+  cropModal.classList.remove("show");
+  cropModal.setAttribute("aria-hidden", "true");
+}
+
+function drawCropCanvas() {
+  const img = cropState.sourceImage;
+  if (!img) return;
+
+  cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+  cropCtx.drawImage(img, 0, 0, cropCanvas.width, cropCanvas.height);
+
+  const s = cropState.selection;
+
+  if (s) {
+    cropCtx.fillStyle = "rgba(10, 2, 22, 0.58)";
+    cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+    cropCtx.clearRect(s.x, s.y, s.w, s.h);
+
+    cropCtx.drawImage(
+      img,
+      s.x * img.naturalWidth / cropCanvas.width,
+      s.y * img.naturalHeight / cropCanvas.height,
+      s.w * img.naturalWidth / cropCanvas.width,
+      s.h * img.naturalHeight / cropCanvas.height,
+      s.x,
+      s.y,
+      s.w,
+      s.h
+    );
+
+    cropCtx.strokeStyle = "#e879f9";
+    cropCtx.lineWidth = 2;
+    cropCtx.strokeRect(s.x, s.y, s.w, s.h);
+  }
+}
+
+function canvasPoint(e) {
+  const r = cropCanvas.getBoundingClientRect();
+
+  return {
+    x: (e.clientX - r.left) * (cropCanvas.width / r.width),
+    y: (e.clientY - r.top) * (cropCanvas.height / r.height)
+  };
+}
+
+cropCanvas.addEventListener("mousedown", e => {
+  const p = canvasPoint(e);
+
+  cropState.isDragging = true;
+  cropState.startX = p.x;
+  cropState.startY = p.y;
+
+  cropState.selection = {
+    x: p.x,
+    y: p.y,
+    w: 1,
+    h: 1
+  };
+});
+
+window.addEventListener("mousemove", e => {
+  if (!cropState.isDragging) return;
+
+  const p = canvasPoint(e);
+
+  const x = Math.max(0, Math.min(cropState.startX, p.x));
+  const y = Math.max(0, Math.min(cropState.startY, p.y));
+  const w = Math.min(cropCanvas.width - x, Math.abs(p.x - cropState.startX));
+  const h = Math.min(cropCanvas.height - y, Math.abs(p.y - cropState.startY));
+
+  cropState.selection = { x, y, w, h };
+
+  cropInfo.textContent =
+    `裁切範圍：約 ${Math.round(w * cropState.sourceImage.naturalWidth / cropCanvas.width)} × ${Math.round(h * cropState.sourceImage.naturalHeight / cropCanvas.height)}px｜輸出：${FIXED_IMAGE_SIZE} × ${FIXED_IMAGE_SIZE}px`;
+
+  drawCropCanvas();
+});
+
+window.addEventListener("mouseup", () => {
+  cropState.isDragging = false;
+});
+
+/* ================= 固定尺寸輸出 ================= */
+
+function useCrop(full = false) {
+  const img = cropState.sourceImage;
+  if (!img) return;
+
+  let sx = 0,
+    sy = 0,
+    sw = img.naturalWidth,
+    sh = img.naturalHeight;
+
+  const s = cropState.selection;
+
+  if (!full && s && s.w > 5 && s.h > 5) {
+    sx = s.x * img.naturalWidth / cropCanvas.width;
+    sy = s.y * img.naturalHeight / cropCanvas.height;
+    sw = s.w * img.naturalWidth / cropCanvas.width;
+    sh = s.h * img.naturalHeight / cropCanvas.height;
+  }
+
+  const out = document.createElement("canvas");
+  const ctx = out.getContext("2d");
+
+  out.width = FIXED_IMAGE_SIZE;
+  out.height = FIXED_IMAGE_SIZE;
+
+  const scale = Math.max(FIXED_IMAGE_SIZE / sw, FIXED_IMAGE_SIZE / sh);
+  const dx = (FIXED_IMAGE_SIZE - sw * scale) / 2;
+  const dy = (FIXED_IMAGE_SIZE - sh * scale) / 2;
+
+  ctx.drawImage(
+    img,
+    sx,
+    sy,
+    sw,
+    sh,
+    dx,
+    dy,
+    sw * scale,
+    sh * scale
+  );
+
+  imageBase64 = out.toDataURL("image/png");
+
+  imageMeta = {
+    width: FIXED_IMAGE_SIZE,
+    height: FIXED_IMAGE_SIZE,
+    fileSize: Math.round(imageBase64.length * 0.75),
+    originalWidth: img.naturalWidth,
+    originalHeight: img.naturalHeight,
+    cropped: !full && !!s
+  };
+
+  previewBox.innerHTML = `<img src="${imageBase64}" alt="圖片預覽">`;
+  imageInfo.textContent = formatImageMeta(imageMeta);
+
+  closeCropper();
+}
+
+cropConfirmBtn.onclick = () => useCrop(false);
+cropFullBtn.onclick = () => useCrop(true);
+
+cropCancelBtn.onclick = () => {
+  resetImageInput();
+  closeCropper();
+};
+
+cropCancelTopBtn.onclick = cropCancelBtn.onclick;
+
+/* ================= 登入狀態更新 ================= */
+
+window.addEventListener("auth:changed", () => {
+  applyRoleVisibility();
+  renderItems();
+  renderLogs();
+});
 
 /* ================= 初始化 ================= */
 
